@@ -1,0 +1,21 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: demp
+  namespace: dev
+data:
+  config.yaml: |
+    server:
+      http:
+        name: demo
+        addr: ":8080"
+        server_config:
+          read_timeout: 10
+          write_timeout: 15
+          read_header_timeout: 12
+          idle_timeout: 8
+    mysql:
+      default:
+        dsn: "username@tcp(demo.com:3306)/prod?charset=utf8"
+        is_debug: "false"

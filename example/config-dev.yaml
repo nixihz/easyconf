@@ -1,0 +1,7 @@
+local:
+  mysql__default__dsn: "username@tcp(127.0.0.1:3306)/dev?charset=utf8"
+  mysql__default__is_debug: true
+
+k8s:
+  mysql__default__dsn: "username@tcp(demo.com:3306)/prod?charset=utf8"
+  mysql__default__is_debug: false
