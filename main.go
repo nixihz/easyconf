@@ -13,7 +13,8 @@ import (
 
 func main() {
 	// input params
-	runTimeEnv := flag.String("r", "", "env: local, k8s")
+	runTimeEnv := flag.String("r", "local", "env: local, k8s")
+	targetTemplate := flag.String("ta", "", "yaml format: configmap, common")
 	templateFile := flag.String("t", "", "path to template file")
 	dataFilePath := flag.String("f", "", "path to data file")
 	outputFilePath := flag.String("o", "", "path to output file")
@@ -24,7 +25,7 @@ func main() {
 	if *runTimeEnv == "" || *templateFile == "" || *dataFilePath == "" || *outputFilePath == "" {
 		flag.Usage()
 		log.Println("example:")
-		log.Println("easyconf -r local -t template.yaml -f data.yaml -o generateFile.yaml")
+		log.Println("easyconf -r local -ta common -t template.yaml -f data.yaml -o generateFile.yaml")
 		return
 	}
 
@@ -36,12 +37,22 @@ func main() {
 	}
 
 	data := parseValue(dataFilePath)
-	if *runTimeEnv == "k8s" {
-		// k8s output configmap.yaml
-		err = generateFile(templateContent, data[*runTimeEnv], *outputFilePath)
+	dataPart, ok := data[*runTimeEnv]
+	if !ok {
+		fmt.Println("no such env files", err)
+		return
+	}
+
+	if *targetTemplate == "configmap" {
+		// gen configmap.yaml
+		err = generateFile(templateContent, dataPart, *outputFilePath)
+		if err != nil {
+			fmt.Println("Failed to write output file:", err)
+			return
+		}
 	} else {
-		// local convert configmap.yaml to multiple files
-		local(templateContent, data[*runTimeEnv], *outputFilePath)
+		// local read configmap.yaml data with multi files
+		local(templateContent, dataPart, *outputFilePath)
 	}
 
 }
